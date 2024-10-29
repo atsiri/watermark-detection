@@ -110,37 +110,12 @@ datasets = {
 
 ### Train Model
 ```bash
-import torch
-from torchvision import datasets, models, transforms
-from PIL import Image
-import pandas as pd
-import pickle
-import sys
-sys.path.append('../')
-from watermarkmodel.model.convnext import convnext_tiny
-from watermarkmodel.model.dataset import WatermarkDataset
-from watermarkmodel.model.preprocess import RandomRotation
-from watermarkmodel.model.train import train_model
-from watermarkmodel.model.preprocess import Preprocessing
-
 model, train_acc, val_acc = train_model_hyperparameter(df_train, df_val, batchsize, learningrate, epoch)
 ```
 
 ### Model Evaluation
 Evaluate test images
 ```bash
-import torch
-import warnings
-warnings.filterwarnings("ignore")
-from PIL import Image
-from watermarkmodel.utils import list_images
-from watermarkmodel.model import get_convnext_model
-from watermarkmodel.model.predictor import WatermarksPredictor
-from watermarkmodel.model.metrics import plot_confusion_matrix
-import pandas as pd
-import pickle
-import os
-
 #validation data
 imagefolder = '../images/test_images/'
 
