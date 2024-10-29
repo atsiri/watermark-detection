@@ -1,0 +1,19 @@
+apiVersion: app/v1
+kind: Deployment
+metadata:
+  name: watermark-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: watermark-api
+  template:
+    metadata:
+      labels:
+        app: watermark-api
+    spec:
+      containers:
+        - name: watermark-api
+          image: <username>/watermark-api:v1
+          ports:
+            - containerPort: 5000
