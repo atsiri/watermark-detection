@@ -171,4 +171,4 @@ from watermarkmodel.model.metrics import plot_confusion_matrix
 
 plot_confusion_matrix(df_result['label'].values, df_result['prediction'].values)
 ```
-
+![confusion matrix](https://github.com/atsiri/watermark-detection/blob/main/notebook/confusion_matrix.png)
