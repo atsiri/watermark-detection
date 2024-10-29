@@ -142,3 +142,29 @@ model_ft, train_acc_history, val_acc_history = train_model(
     model_ft, dataloaders_dict, criterion, optimizer, num_epochs=10
 )
 ```
+
+### Model Evaluation
+Evaluate test images
+```bash
+import warnings
+warnings.filterwarnings("ignore")
+from watermarkmodel.utils import list_images
+from watermarkmodel.model import get_convnext_model
+from watermarkmodel.model.predictor import WatermarksPredictor
+import pickle
+
+#validation data
+images = list_images('../images/test_images/') 
+
+pkl_filename = "watermark_model.pkl"
+with open(pkl_filename, 'rb') as f_in:
+    modelpkl = pickle.load(f_in)
+
+transforms = get_convnext_model('convnext-tiny')[1]
+predictor = WatermarksPredictor(modelpkl, transforms, 'cpu')
+result = predictor.run(images)
+```
+
+Plot Confusion Matrix
+```bash
+```
