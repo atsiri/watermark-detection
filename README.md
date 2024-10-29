@@ -52,10 +52,20 @@ result = predictor.run(images)
 ```
 
 ### REST-API Usage
+access the app.py
 ```bash
 cd flask-api
 python app.py
-http://127.0.0.1:5000
+```
+
+call API from python
+```bash
+import requests
+
+filename = 'wm1.jpg'
+urlimage = 'http://127.0.0.1:5000/predict/' + filename
+response = requests.get(url)
+print(response.text)
 ```
 
 ### Kubernetes Deployment
