@@ -16,6 +16,7 @@ Repository contents:
 3. [Model](https://github.com/atsiri/watermark-detection/tree/main/watermarkmodel) (model functions)
 4. [Notebook](https://github.com/atsiri/watermark-detection/tree/main/notebook) (guide to run and train the model)
 5. [Flask-API](https://github.com/atsiri/watermark-detection/blob/main/app.py)
+6. [Airflow Pipeline](https://github.com/atsiri/watermark-detection/tree/main/ml_pipeline)
 
 ## Usage
 ### Basic Usage
