@@ -5,7 +5,8 @@
 ```bash
 git clone https://github.com/atsiri/watermark-detection
 cd watermark-detection
-pip install -r requirements.txt```
+pip install -r requirements.txt
+```
 
 Repository contents:
 1. Images (contains initial image datasets)
