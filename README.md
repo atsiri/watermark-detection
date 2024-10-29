@@ -68,15 +68,6 @@ response = requests.get(url)
 print(response.text)
 ```
 
-### Kubernetes Deployment
-```bash
-minikube start
-minikube image load watermark-api:v1
-
-kubectl create deploy watermark-deploy –image=watermark-api:v1
-kubectl expose deploy/watermark-deploy --name=watermark-service --target-port=5000 --port=5001
-```
-
 ## Train Model
 ### Dataset Preprocessing
 ```bash
@@ -118,6 +109,14 @@ datasets = {
 ```bash
 model, train_acc, val_acc = train_model_hyperparameter(df_train, df_val, batchsize, learningrate, epoch)
 ```
+save best result model into pickle file:
+```bash
+import pickle
+
+#save model
+filename = 'watermark_model.pkl'
+pickle.dump(model, open(filename, 'wb'))
+```
 
 ### Model Evaluation
 Evaluate test images
@@ -137,3 +136,19 @@ precision, recall, accuracy, figures = evaluate_ml_model(picklefile, imagefolder
 figures.figure_.savefig('confusion_matrix.png')
 ```
 ![confusion matrix](https://github.com/atsiri/watermark-detection/blob/main/notebook/confusion_matrix.png)
+
+### Docker Containerization
+```bash
+docker build -t watermark-api:v1
+docker push watermark-api:v1
+docker run -it --rm -P watermark-api:v1
+```
+
+### Kubernetes Deployment
+```bash
+minikube start
+minikube image load watermark-api:v1
+
+kubectl create deploy watermark-deploy –image=watermark-api:v1
+kubectl expose deploy/watermark-deploy --name=watermark-service --target-port=5000 --port=5001
+```
