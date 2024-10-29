@@ -167,4 +167,8 @@ result = predictor.run(images)
 
 Plot Confusion Matrix
 ```bash
+from watermarkmodel.model.metrics import plot_confusion_matrix
+
+plot_confusion_matrix(df_result['label'].values, df_result['prediction'].values)
 ```
+
