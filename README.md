@@ -110,59 +110,44 @@ datasets = {
 
 ### Train Model
 ```bash
-import warnings
-warnings.filterwarnings("ignore")
+import torch
+from torchvision import datasets, models, transforms
+from PIL import Image
+import pandas as pd
+import pickle
+import sys
+sys.path.append('../')
 from watermarkmodel.model.convnext import convnext_tiny
+from watermarkmodel.model.dataset import WatermarkDataset
+from watermarkmodel.model.preprocess import RandomRotation
 from watermarkmodel.model.train import train_model
+from watermarkmodel.model.preprocess import Preprocessing
 
-#load model
-model_ft = convnext_tiny(pretrained=True, in_22k=True, num_classes=21841)
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
-#config
-criterion = torch.nn.CrossEntropyLoss()
-optimizer = optim.AdamW(params=model_ft.parameters(), lr=0.2e-5)
-BATCH_SIZE = 8
-dataloaders_dict = {
-    x: torch.utils.data.DataLoader(datasets[x], batch_size=BATCH_SIZE, shuffle=True, num_workers=0) #to prevent runtimeerror on non gpu device
-    for x in ['train', 'val']
-}
-
-#NN model set up
-model_ft.head = nn.Sequential( 
-    nn.Linear(in_features=768, out_features=512),
-    nn.GELU(),
-    nn.Linear(in_features=512, out_features=256),
-    nn.GELU(),
-    nn.Linear(in_features=256, out_features=2),
-)
-
-#train
-model_ft, train_acc_history, val_acc_history = train_model(
-    model_ft, dataloaders_dict, criterion, optimizer, num_epochs=10
-)
+model, train_acc, val_acc = train_model_hyperparameter(df_train, df_val, batchsize, learningrate, epoch)
 ```
 
 ### Model Evaluation
 Evaluate test images
 ```bash
+import torch
 import warnings
 warnings.filterwarnings("ignore")
+from PIL import Image
 from watermarkmodel.utils import list_images
 from watermarkmodel.model import get_convnext_model
 from watermarkmodel.model.predictor import WatermarksPredictor
+from watermarkmodel.model.metrics import plot_confusion_matrix
+import pandas as pd
 import pickle
+import os
 
 #validation data
-images = list_images('../images/test_images/') 
+imagefolder = '../images/test_images/'
 
-pkl_filename = "watermark_model.pkl"
-with open(pkl_filename, 'rb') as f_in:
-    modelpkl = pickle.load(f_in)
+#model
+picklefile = "watermark_model.pkl"
 
-transforms = get_convnext_model('convnext-tiny')[1]
-predictor = WatermarksPredictor(modelpkl, transforms, 'cpu')
-result = predictor.run(images)
+precision, recall, accuracy, figures = evaluate_ml_model(picklefile, imagefolder)
 ```
 
 Plot Confusion Matrix
