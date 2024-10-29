@@ -14,4 +14,4 @@ def plot_confusion_matrix(x: np.ndarray, y: np.ndarray):
 
     precision = tp / tp_and_fp
     recall = tp / tp_and_fn
-    return disp.plot(), precision, recall
+    return disp, precision, recall
