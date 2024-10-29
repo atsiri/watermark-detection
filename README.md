@@ -152,8 +152,7 @@ precision, recall, accuracy, figures = evaluate_ml_model(picklefile, imagefolder
 
 Plot Confusion Matrix
 ```bash
-confmatrix = plot_confusion_matrix(df_result['label'].values, df_result['prediction'].values)
-print('- precision: ', confmatrix[1][0], '\n- recall:', confmatrix[2][1])
-confmatrix[0].figure_.savefig('confusion_matrix.png')
+precision, recall, accuracy, figures = evaluate_ml_model(picklefile, imagefolder)
+figures.figure_.savefig('confusion_matrix.png')
 ```
 ![confusion matrix](https://github.com/atsiri/watermark-detection/blob/main/notebook/confusion_matrix.png)
