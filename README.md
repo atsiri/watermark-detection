@@ -55,9 +55,78 @@ cd flask-api
 python app.py
 http://127.0.0.1:5000
 ```
+
 ### Kubernetes Deployment
 
 
 ## Train Model
+### Dataset Preprocessing
+```bash
+from watermarkmodel.model.dataset import WatermarkDataset
+import pandas as pd
 
-##
+#normalization
+preprocess = {
+    'train': transforms.Compose([
+        transforms.Resize((input_size, input_size)),
+        #transforms.RandomCrop(input_size),
+        transforms.RandomHorizontalFlip(),
+        transforms.ToTensor(),
+        RandomRotation([90, -90], 0.2),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+    ]),
+    'val': transforms.Compose([
+        transforms.Resize((input_size, input_size)),
+        #transforms.CenterCrop(input_size),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+    ]),
+}
+
+#read dataset
+df_train = pd.read_csv('../dataset/train_data_v1.csv')
+df_val = pd.read_csv('../dataset/val_data_v1.csv')
+
+#create dataset
+train_ds = WatermarkDataset(df_train, preprocess['train'])
+val_ds = WatermarkDataset(df_val, preprocess['val'])
+datasets = {
+    'train': train_ds,
+    'val': val_ds,
+}
+```
+
+### Train Model
+```bash
+import warnings
+warnings.filterwarnings("ignore")
+from watermarkmodel.model.convnext import convnext_tiny
+from watermarkmodel.model.train import train_model
+
+#load model
+model_ft = convnext_tiny(pretrained=True, in_22k=True, num_classes=21841)
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+#config
+criterion = torch.nn.CrossEntropyLoss()
+optimizer = optim.AdamW(params=model_ft.parameters(), lr=0.2e-5)
+BATCH_SIZE = 8
+dataloaders_dict = {
+    x: torch.utils.data.DataLoader(datasets[x], batch_size=BATCH_SIZE, shuffle=True, num_workers=0) #to prevent runtimeerror on non gpu device
+    for x in ['train', 'val']
+}
+
+#NN model set up
+model_ft.head = nn.Sequential( 
+    nn.Linear(in_features=768, out_features=512),
+    nn.GELU(),
+    nn.Linear(in_features=512, out_features=256),
+    nn.GELU(),
+    nn.Linear(in_features=256, out_features=2),
+)
+
+#train
+model_ft, train_acc_history, val_acc_history = train_model(
+    model_ft, dataloaders_dict, criterion, optimizer, num_epochs=10
+)
+```
