@@ -15,7 +15,7 @@ Repository contents:
 2. [Dataset](https://github.com/atsiri/watermark-detection/tree/main/watermarkmodel) (processed image datasets, *split into train, test, and validation sets*)
 3. [Model](https://github.com/atsiri/watermark-detection/tree/main/watermarkmodel) (model functions)
 4. [Notebook](https://github.com/atsiri/watermark-detection/tree/main/notebook) (guide to run and train the model)
-5. Flask-API (REST-API files)
+5. [Flask-API](https://github.com/atsiri/watermark-detection/blob/main/app.py)
 
 ## Usage
 ### Basic Usage
@@ -68,9 +68,6 @@ response = requests.get(url)
 print(response.text)
 ```
 
-### Kubernetes Deployment
-
-
 ## Train Model
 ### Dataset Preprocessing
 ```bash
@@ -110,65 +107,48 @@ datasets = {
 
 ### Train Model
 ```bash
-import warnings
-warnings.filterwarnings("ignore")
-from watermarkmodel.model.convnext import convnext_tiny
-from watermarkmodel.model.train import train_model
+model, train_acc, val_acc = train_model_hyperparameter(df_train, df_val, batchsize, learningrate, epoch)
+```
+save best result model into pickle file:
+```bash
+import pickle
 
-#load model
-model_ft = convnext_tiny(pretrained=True, in_22k=True, num_classes=21841)
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
-#config
-criterion = torch.nn.CrossEntropyLoss()
-optimizer = optim.AdamW(params=model_ft.parameters(), lr=0.2e-5)
-BATCH_SIZE = 8
-dataloaders_dict = {
-    x: torch.utils.data.DataLoader(datasets[x], batch_size=BATCH_SIZE, shuffle=True, num_workers=0) #to prevent runtimeerror on non gpu device
-    for x in ['train', 'val']
-}
-
-#NN model set up
-model_ft.head = nn.Sequential( 
-    nn.Linear(in_features=768, out_features=512),
-    nn.GELU(),
-    nn.Linear(in_features=512, out_features=256),
-    nn.GELU(),
-    nn.Linear(in_features=256, out_features=2),
-)
-
-#train
-model_ft, train_acc_history, val_acc_history = train_model(
-    model_ft, dataloaders_dict, criterion, optimizer, num_epochs=10
-)
+#save model
+filename = 'watermark_model.pkl'
+pickle.dump(model, open(filename, 'wb'))
 ```
 
 ### Model Evaluation
 Evaluate test images
 ```bash
-import warnings
-warnings.filterwarnings("ignore")
-from watermarkmodel.utils import list_images
-from watermarkmodel.model import get_convnext_model
-from watermarkmodel.model.predictor import WatermarksPredictor
-import pickle
-
 #validation data
-images = list_images('../images/test_images/') 
+imagefolder = '../images/test_images/'
 
-pkl_filename = "watermark_model.pkl"
-with open(pkl_filename, 'rb') as f_in:
-    modelpkl = pickle.load(f_in)
+#model
+picklefile = "watermark_model.pkl"
 
-transforms = get_convnext_model('convnext-tiny')[1]
-predictor = WatermarksPredictor(modelpkl, transforms, 'cpu')
-result = predictor.run(images)
+precision, recall, accuracy, figures = evaluate_ml_model(picklefile, imagefolder)
 ```
 
 Plot Confusion Matrix
 ```bash
-from watermarkmodel.model.metrics import plot_confusion_matrix
-
-plot_confusion_matrix(df_result['label'].values, df_result['prediction'].values)
+precision, recall, accuracy, figures = evaluate_ml_model(picklefile, imagefolder)
+figures.figure_.savefig('confusion_matrix.png')
 ```
 ![confusion matrix](https://github.com/atsiri/watermark-detection/blob/main/notebook/confusion_matrix.png)
+
+### Docker Containerization
+```bash
+docker build -t watermark-api:v1
+docker push watermark-api:v1
+docker run -it --rm -P watermark-api:v1
+```
+
+### Kubernetes Deployment
+```bash
+minikube start
+minikube image load watermark-api:v1
+
+kubectl create deploy watermark-deploy –image=watermark-api:v1
+kubectl expose deploy/watermark-deploy --name=watermark-service --target-port=5000 --port=5001
+```
