@@ -1,5 +1,7 @@
 # watermark-detection
 
+Fine-tuned watermark detection model for tiny-sized dataset, using pretrained ConvNEXT-tiny architecture.
+
 ## Installation:
 
 ```bash
