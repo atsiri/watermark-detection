@@ -69,7 +69,13 @@ print(response.text)
 ```
 
 ### Kubernetes Deployment
+```bash
+minikube start
+minikube image load watermark-api:v1
 
+kubectl create deploy watermark-deploy –image=watermark-api:v1
+kubectl expose deploy/watermark-deploy --name=watermark-service --target-port=5000 --port=5001
+```
 
 ## Train Model
 ### Dataset Preprocessing
