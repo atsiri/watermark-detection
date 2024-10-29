@@ -29,6 +29,8 @@ device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu'),
 fp16=False, cache_dir='../watermarkmodel/model/models')
 ```
 
+* Download the model file from [here](https://huggingface.co/atsiri/convnext_watermark-detection)
+
 #### Detect Watermark of a Single Image
 ```bash
 #detect watermark
