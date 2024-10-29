@@ -15,7 +15,7 @@ Repository contents:
 2. [Dataset](https://github.com/atsiri/watermark-detection/tree/main/watermarkmodel) (processed image datasets, *split into train, test, and validation sets*)
 3. [Model](https://github.com/atsiri/watermark-detection/tree/main/watermarkmodel) (model functions)
 4. [Notebook](https://github.com/atsiri/watermark-detection/tree/main/notebook) (guide to run and train the model)
-5. Flask-API (REST-API files)
+5. [Flask-API](https://github.com/atsiri/watermark-detection/blob/main/app.py)
 
 ## Usage
 ### Basic Usage
@@ -167,8 +167,8 @@ result = predictor.run(images)
 
 Plot Confusion Matrix
 ```bash
-from watermarkmodel.model.metrics import plot_confusion_matrix
-
-plot_confusion_matrix(df_result['label'].values, df_result['prediction'].values)
+confmatrix = plot_confusion_matrix(df_result['label'].values, df_result['prediction'].values)
+print('- precision: ', confmatrix[1][0], '\n- recall:', confmatrix[2][1])
+confmatrix[0].figure_.savefig('confusion_matrix.png')
 ```
 ![confusion matrix](https://github.com/atsiri/watermark-detection/blob/main/notebook/confusion_matrix.png)
