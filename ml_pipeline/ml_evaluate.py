@@ -32,7 +32,7 @@ def evaluate_ml_model():
 
     #metric result
     confmatrix = plot_confusion_matrix(df_result['label'].values, df_result['prediction'].values)
-    precision = confmatrix[1][0]
+    precision = confmatrix[1][1]
     recall = confmatrix[2][1]
     figures = confmatrix[0].figure_.savefig('confusion_matrix.png')
 
